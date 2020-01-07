@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
    description: DataTypes.STRING,
    address: DataTypes.STRING,
    url_maps: DataTypes.STRING,
-   image: DataTypes.STRING,
+   img: DataTypes.STRING,
    creator_id: DataTypes.INTEGER
   },
   {}
@@ -25,6 +25,10 @@ module.exports = (sequelize, DataTypes) => {
   events.belongsTo(models.users, {
    as: "createdBy",
    foreignKey: "creator_id"
+  });
+  events.hasMany(models.favorites, {
+   as: "favorite",
+   foreignKey: "event_id"
   });
  };
  return events;

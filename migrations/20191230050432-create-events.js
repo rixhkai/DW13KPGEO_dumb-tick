@@ -39,7 +39,7 @@ module.exports = {
    url_maps: {
     type: Sequelize.STRING
    },
-   image: {
+   img: {
     type: Sequelize.STRING
    },
    creator_id: {

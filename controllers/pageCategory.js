@@ -9,7 +9,7 @@ exports.getCat = (req, res) => {
  cat
   .findOne({
    where: {id: req.params.id},
-   attributes: ["id", "name"],
+   attributes: ["id", "name", 'image'],
    include: [
     {
      model: eve,
@@ -23,7 +23,7 @@ exports.getCat = (req, res) => {
       "description",
       "address",
       "url_maps",
-      "image"
+      "img"
      ],
      include: [
       {

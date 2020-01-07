@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
    as: "user",
    foreignKey: "user_id"
   });
-  orders.hasMany(models.events, {
+  orders.belongsTo(models.events, {
    as: "event",
    foreignKey: "event_id"
   });

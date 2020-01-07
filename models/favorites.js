@@ -14,9 +14,9 @@ module.exports = (sequelize, DataTypes) => {
    as: "createdBy",
    foreignKey: "user_id"
   });
-  favorites.hasMany(models.events, {
+  favorites.belongsTo(models.events, {
    as: "events",
-   foreignKey: "category_id"
+   foreignKey: "event_id"
   });
  };
  return favorites;

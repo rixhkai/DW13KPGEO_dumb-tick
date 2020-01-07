@@ -10,6 +10,17 @@ exports.show = (req, res) => {
  eve
   .findOne({
    where: {id: req.params.id},
+   attributes: [
+    "id",
+    "title",
+    "start_time",
+    "end_time",
+    "price",
+    "description",
+    "address",
+    "url_maps",
+    "img"
+   ],
    include: [
     {model: use, as: "createdBy"},
     {

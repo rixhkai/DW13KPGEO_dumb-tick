@@ -3,25 +3,95 @@ const jwt = require("jsonwebtoken");
 const cat = models.categories;
 const eve = models.events;
 const use = models.users;
+const fav = models.favorites;
 
 //Get Categories
 exports.cats = (req, res) => {
  console.log("get all categories");
  cat
   .findAll({
-   attributes: ["id", "name"]
+   attributes: ["id", "name", "image"]
   })
   .then(some => res.send(some))
   .catch(err => res.send(err));
 };
 
-///article by category
+exports.showAll = (req, res) => {
+ console.log("get events");
+ eve
+  .findAll({
+   attributes: [
+    "id",
+    "title",
+    "start_time",
+    "end_time",
+    "price",
+    "description",
+    "address",
+    "url_maps",
+    "img"
+   ],
+   include: [
+    {model: cat, as: "category", attributes: ["id", "name", 'image']},
+    {
+     model: use,
+     as: "createdBy",
+     attributes: ["id", "name", "phone", "email", "image"]
+    },
+    {
+     model: fav,
+     as: "favorite",
+     attributes: ["id", "event_id", "user_id"],
+     limit: 1
+    }
+   ]
+  })
+  .then(event => res.send(event))
+  .catch(err => res.send(err));
+};
+
+exports.showEvents = (req, res) => {
+ console.log("get events");
+ eve
+  .findAll({
+   where: {category_id: req.params.id},
+   attributes: [
+    "id",
+    "title",
+    "start_time",
+    "end_time",
+    "price",
+    "description",
+    "address",
+    "url_maps",
+    "img"
+   ],
+   include: [
+    {model: cat, as: "category", attributes: ["id", "name", "image"]},
+    {
+     model: use,
+     as: "createdBy",
+     attributes: ["id", "name", "phone", "email", "image"]
+    },
+    {
+     model: fav,
+     as: "favorite",
+     attributes: ["id", "event_id", "user_id"],
+     limit: 1
+    }
+   ]
+  })
+  .then(event => res.send(event))
+  .catch(err => res.send(err));
+};
+
+///events by category
 exports.getCat = (req, res) => {
- console.log("get Article by category");
+ console.log("get events by category");
  cat
   .findOne({
    where: {id: req.params.id},
-   attributes: ["id", "name"],
+   attributes: ["id", "name", "image"],
    include: [
     {
      model: eve,
@@ -35,7 +105,7 @@ exports.getCat = (req, res) => {
       "description",
       "address",
       "url_maps",
-      "image"
+      "img"
      ],
      include: [
       {
@@ -54,10 +124,11 @@ exports.getCat = (req, res) => {
 ///get today events
 exports.today = (req, res) => {
  //  const today = Date.now();
- console.log("get today events" + req.query.start_time);
+ var mydate = new Date(req.query.start_time);
+ console.log("get today events" + mydate);
  eve
   .findAll({
-   where: {start_time: req.query.start_time},
+   where: {start_time: mydate},
    attributes: [
     "id",
     "title",
@@ -67,10 +138,10 @@ exports.today = (req, res) => {
     "description",
     "address",
     "url_maps",
-    "image"
+    "img"
    ],
    include: [
-    {model: cat, as: "category", attributes: ["id", "name"]},
+    {model: cat, as: "category", attributes: ["id", "name", "image"]},
     {
      model: use,
      as: "createdBy",
@@ -88,9 +159,10 @@ exports.tomorrow = (req, res) => {
  //  const tom = new Date(today.getTime() + 86400000);
  //  const tomorrow = tom.toLocaleDateString();
  //  console.log(tomorrow);
+ var mydate = new Date(req.query.start_time);
  eve
   .findAll({
-   where: {start_time: req.query.start_time},
+   where: {start_time: mydate},
    attributes: [
     "id",
     "title",
@@ -100,10 +172,10 @@ exports.tomorrow = (req, res) => {
     "description",
     "address",
     "url_maps",
-    "image"
+    "img"
    ],
    include: [
-    {model: cat, as: "category", attributes: ["id", "name"]},
+    {model: cat, as: "category", attributes: ["id", "name", "image"]},
     {
      model: use,
      as: "createdBy",
@@ -131,10 +203,10 @@ exports.search = (req, res) => {
     "description",
     "address",
     "url_maps",
-    "image"
+    "img"
    ],
    include: [
-    {model: cat, as: "category", attributes: ["id", "name"]},
+    {model: cat, as: "category", attributes: ["id", "name", 'image']},
     {
      model: use,
      as: "createdBy",
@@ -149,7 +221,7 @@ exports.search = (req, res) => {
 ///////////POSTING or Create \\\\\\\\\\\
 
 ///create event or add events
-exports.store = (req, res) => {
+exports.AddEvent = (req, res) => {
  eve.create(req.body).then(some => {
   res.send({
    message: "success",
@@ -176,7 +248,10 @@ exports.login = (req, res) => {
  const username = req.body.username;
  const password = req.body.password;
  use
-  .findOne({where: {username, password}, attributes: ["username", "password"]})
+  .findOne({
+   where: {username, password},
+   attributes: ["id", "username", "email", "image", "name"]
+  })
   .then(user => {
    if (user) {
     const token = jwt.sign({id: user.id}, "bakamono");
